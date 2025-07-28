@@ -75,9 +75,9 @@ Replica Sets are groups of MongoDB servers that maintain the same data, providin
 - If the primary fails, an election process promotes a secondary to primary, ensuring continued availability.
 
 
-<div style="text-align: center;">
+<p align="center">
   <img src="./Replica_Sets.png" alt="Replica Set Diagram" width="400" />
-</div>
+</p>
 
 ### Advantages and Disadvantages
 
@@ -99,10 +99,9 @@ Sharding is MongoDB’s method of horizontally scaling by distributing data acro
 - A query router (mongos) directs operations to the appropriate shard(s).
 - Balancer process redistributes data to maintain an even load.
 
-
-<div style="text-align: center;">
+<p align="center">
   <img src="./Sharding.png" alt="Sharding Diagram" width="400" />
-</div>
+</p>
 
 ### Advantages and Disadvantages
 

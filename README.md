@@ -61,3 +61,47 @@ For example, a `users` collection might contain all user profile documents in an
   }
 ]
 ```
+
+
+## MongoDB Architecture
+
+### What are Replica Sets?
+Replica Sets are groups of MongoDB servers that maintain the same data, providing redundancy and high availability.
+
+### How do they work?
+
+- One primary node receives all write operations.
+- Multiple secondary nodes replicate data from the primary asynchronously.
+- If the primary fails, an election process promotes a secondary to primary, ensuring continued availability.
+
+![MongoDB Replica Set Diagram](./Replica_Sets.png)
+
+### Advantages and Disadvantages
+
+| Advantages                      | Disadvantages                  |
+| -------------------------------| ------------------------------|
+| High availability and redundancy | Replication lag possible       |
+| Automatic failover              | More complex to manage         |
+| Data durability                | Increased resource usage       |
+
+
+### What is Sharding?
+
+Sharding is MongoDB’s method of horizontally scaling by distributing data across multiple servers (shards).
+
+### How does it work in MongoDB specifically?
+
+- Data is partitioned using a shard key.
+- Each shard holds a subset of the data.
+- A query router (mongos) directs operations to the appropriate shard(s).
+- Balancer process redistributes data to maintain an even load.
+
+![MongoDB Sharding Diagram](./Sharding.png)
+
+### Advantages and Disadvantages
+
+| Advantages                     | Disadvantages                   |
+| ------------------------------| -------------------------------|
+| Scales data across many servers | Shard key selection is critical |
+| Handles large data volumes     | Increased operational complexity |
+| Supports high throughput       | Some queries can be slower if not shard-key targeted |

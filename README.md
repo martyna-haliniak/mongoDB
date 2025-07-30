@@ -110,3 +110,257 @@ Sharding is MongoDB’s method of horizontally scaling by distributing data acro
 | Scales data across many servers | Shard key selection is critical |
 | Handles large data volumes     | Increased operational complexity |
 | Supports high throughput       | Some queries can be slower if not shard-key targeted |
+
+
+## MongoDB Commands
+
+#### 1. Basic MongoDB Shell Commands
+
+Switch to or create a database:
+```js
+use starwars
+```
+
+Create a collection:
+```js
+db.createCollection("characters")
+```
+
+#### 2. Inserting Data
+Insert one document:
+```js
+db.characters.insertOne({
+  name: "Luke Skywalker",
+  species: "Human",
+  height: "172",
+  mass: "77",
+  gender: "male",
+  eye_color: "blue"
+})
+```
+
+Insert many documents:
+```js
+db.characters.insertMany([
+  { name: "Leia Organa", species: "Human", height: "150", mass: "49", gender: "female", eye_color: "brown" },
+  { name: "Chewbacca", species: "Wookiee", height: "228", mass: "112", gender: "male", eye_color: "blue" }
+])
+```
+
+#### 3. Query Documents
+
+Find all:
+```js
+db.characters.find()
+```
+
+*.find() vs .find({})*
+- Both return all documents in the collection.
+
+- .find({}) is explicitly saying “find everything with no filter”.
+
+Filter results:
+```js
+db.characters.find({gender: "female"})
+```
+Show specific fields only:
+```js
+db.characters.find(
+  { gender: "female" },
+  { name: 1, eye_color: 1, _id: 0 }
+)
+```
+
+#### 4. Updating Data
+Update One:
+```js
+
+db.characters.updateOne(
+  { name: "Chewbacca" },
+  { $set: { mass: "1,358" } }
+)
+```
+Remove a Field:
+```js
+db.characters.updateMany(
+  { mass: "unknown" },
+  { $unset: { mass: "" } }
+)
+```
+Convert Mass to a Number:
+```js
+db.characters.updateMany(
+  { mass: { $exists: true } },
+  [ { $set: { mass: { $toDouble: "$mass" } } } ]
+)
+```
+
+#### 5. Aggregation
+##### What is aggregation?
+The .aggregate() method lets you build a data pipeline, processing documents through multiple stages. It’s like combining filtering, grouping, sorting, and transforming in one command.
+
+##### Structure
+```js
+db.collection.aggregate([
+  { /* stage 1 */ },
+  { /* stage 2 */ },
+  ...
+])
+```
+Each stage processes the documents before passing them to the next.
+
+##### Common Stages
+
+- $match – Filters documents (like .find())
+```js
+{ $match: { gender: "female" } }
+```
+
+- $group – Group by a field and do calculations
+
+```js
+{
+  $group: {
+    _id: "$species",
+    averageMass: { $avg: "$mass" },
+    count: { $sum: 1 }
+  }
+}
+```
+
+- $sort – Sort results
+```js
+{ $sort: { averageMass: 1 } }
+```
+
+- $project – Show or hide fields
+```js
+{ $project: { name: 1, height: 1, _id: 0 } }
+```
+
+- $addFields – Add new or calculated fields
+```js
+{
+  $addFields: {
+    heightInt: { $toInt: "$height" }
+  }
+}
+```
+
+- $expr – Use expressions (like $gt) on fields
+Used inside $match when filtering based on calculated values.
+
+
+##### Example: Average Mass and Count per Species
+```js
+db.characters.aggregate([
+  {
+    $match: {
+      mass: { $ne: null },
+      species: { $ne: null }
+    }
+  },
+  {
+    $group: {
+      _id: "$species",
+      averageMass: { $avg: "$mass" },
+      count: { $sum: 1 }
+    }
+  },
+  {
+    $sort: { averageMass: 1 }
+  }
+])
+```
+
+**Explanation**:
+- $match – Excludes documents missing mass or species
+
+- $group – Groups by species, calculates average mass and counts
+
+- $sort – Sorts species from lightest to heaviest
+
+#### 6. List Collections in a Database
+
+Get collection names only:
+```js
+db.getCollectionNames()
+```
+Get detailed info:
+```js
+db.getCollectionInfos()
+```
+
+#### 7. Advanced Filtering with Conversion
+Find Characters Taller Than 200 (Exclude "unknown")
+```js
+db.characters.find(
+  {
+    $expr: {
+      $gt: [
+        {
+          $convert: {
+            input: "$height",
+            to: "int",
+            onError: null
+          }
+        },
+        200
+      ]
+    }
+  },
+  {
+    name: 1,
+    height: 1,
+    _id: 0
+  }
+)
+```
+
+
+
+### MongoDB Operator Summary
+
+#### Comparison Operators
+
+| Operator     | Meaning                                      | Example Use                                    |
+|--------------|----------------------------------------------|------------------------------------------------|
+| `$gt`        | Greater than                                 | `{ height: { $gt: 180 } }`                     |
+| `$gte`       | Greater than or equal                        | `{ height: { $gte: 180 } }`                    |
+| `$lt`        | Less than                                    | `{ height: { $lt: 180 } }`                     |
+| `$lte`       | Less than or equal                           | `{ height: { $lte: 180 } }`                    |
+| `$eq`        | Equals                                        | `{ eye_color: { $eq: "blue" } }`               |
+| `$ne`        | Not equal                                     | `{ eye_color: { $ne: "unknown" } }`            |
+| `$in`        | Value is in a given array                     | `{ species: { $in: ["Human", "Wookiee"] } }`   |
+| `$nin`       | Value is **not** in a given array             | `{ species: { $nin: ["Droid", "unknown"] } }`  |
+
+#### Aggregation Stages
+
+| Stage         | Description                                                               |
+|---------------|---------------------------------------------------------------------------|
+| `$match`      | Filters documents like `.find()`                                          |
+| `$group`      | Groups data by a field and performs calculations (e.g., count, avg)       |
+| `$sort`       | Sorts documents (1 for ascending, -1 for descending)                      |
+| `$project`    | Selects or reshapes which fields to return                                |
+| `$addFields`  | Adds new fields or calculated values                                      |
+| `$unset`      | Removes a field                                                           |
+| `$limit`      | Limits number of documents returned                                       |
+| `$skip`       | Skips a number of documents (used for pagination)                         |
+
+#### Update Operators
+
+| Operator     | Description                                         | Example                                        |
+|--------------|-----------------------------------------------------|------------------------------------------------|
+| `$set`       | Sets the value of a field                           | `{ $set: { mass: "100" } }`                    |
+| `$unset`     | Removes a field from the document                   | `{ $unset: { mass: "" } }`                     |
+| `$inc`       | Increments a field by a given value                 | `{ $inc: { age: 1 } }`                         |
+
+#### Conversion & Logic
+
+| Operator       | Description                                                     | Example                                          |
+|----------------|-----------------------------------------------------------------|--------------------------------------------------|
+| `$toInt`       | Converts a field to an integer                                  | `{ $toInt: "$height" }`                         |
+| `$toDouble`    | Converts a field to a double (decimal)                          | `{ $toDouble: "$mass" }`                        |
+| `$convert`     | Flexible conversion with `onError` or `onNull` options          | See filtering section                           |
+| `$cond`        | "If this, then that, else..." logic                             | `{ $cond: { if: ..., then: ..., else: ... } }`  |
+| `$expr`        | Enables use of operators in `.find()` filtering                 | `{ $expr: { $gt: [...] } }`                     |

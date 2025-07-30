@@ -112,9 +112,9 @@ Sharding is MongoDB’s method of horizontally scaling by distributing data acro
 | Supports high throughput       | Some queries can be slower if not shard-key targeted |
 
 
-## MongoDB Commands
+## MongoDB Shell Commands
 
-#### 1. Basic MongoDB Shell Commands
+#### 1. Basic MongoDB Commands
 
 Switch to or create a database:
 ```js

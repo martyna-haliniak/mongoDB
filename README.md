@@ -114,7 +114,7 @@ Sharding is MongoDB’s method of horizontally scaling by distributing data acro
 
 ## MongoDB Shell Commands
 
-#### 1. Basic MongoDB Commands
+### 1. Basic MongoDB Commands
 
 Switch to or create a database:
 ```js
@@ -126,7 +126,7 @@ Create a collection:
 db.createCollection("characters")
 ```
 
-#### 2. Inserting Data
+### 2. Inserting Data
 Insert one document:
 ```js
 db.characters.insertOne({
@@ -147,7 +147,7 @@ db.characters.insertMany([
 ])
 ```
 
-#### 3. Query Documents
+### 3. Query Documents
 
 Find all:
 ```js
@@ -171,7 +171,7 @@ db.characters.find(
 )
 ```
 
-#### 4. Updating Data
+### 4. Updating Data
 Update One:
 ```js
 
@@ -195,7 +195,7 @@ db.characters.updateMany(
 )
 ```
 
-#### 5. Aggregation
+### 5. Aggregation
 ##### What is aggregation?
 The .aggregate() method lets you build a data pipeline, processing documents through multiple stages. It’s like combining filtering, grouping, sorting, and transforming in one command.
 
@@ -280,7 +280,7 @@ db.characters.aggregate([
 
 - $sort – Sorts species from lightest to heaviest
 
-#### 6. List Collections in a Database
+### 6. List Collections in a Database
 
 Get collection names only:
 ```js
@@ -291,7 +291,7 @@ Get detailed info:
 db.getCollectionInfos()
 ```
 
-#### 7. Advanced Filtering with Conversion
+### 7. Advanced Filtering with Conversion
 Find Characters Taller Than 200 (Exclude "unknown")
 ```js
 db.characters.find(
@@ -318,6 +318,7 @@ db.characters.find(
 ```
 
 
+---
 
 ### MongoDB Operator Summary
 
